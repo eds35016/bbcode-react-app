@@ -62,7 +62,10 @@ export default function PreviewPage() {
         const token = `__VAR_${k}__`
         const type = template.variables.find(x => x.name === k)?.type || 'text'
         const bb = formatValue(v, type)
-        const htmlSeg = bb ? parse(bb) : ''
+        let htmlSeg = bb ? parse(bb) : ''
+        htmlSeg = htmlSeg
+          .replace(/<\/br>/g, '<br/>')
+          .replace(/(?:\r\n|\r|\n)/g, '<br/>')
         const span = `<span data-var="${k}" class="${activeVar === k ? 'highlight' : ''}">${htmlSeg}</span>`
         output = output.replaceAll(token, span)
       })
