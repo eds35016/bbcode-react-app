@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { loadTemplates, saveTemplate } from '../utils/storage'
 import { v4 as uuidv4 } from 'uuid'
+
+const TYPE_OPTIONS = [
+  { value: 'text', label: 'Text' },
+  { value: 'multiline', label: 'Multi-line Text' },
+  { value: 'bulleted-list', label: 'Bulleted List' },
+  { value: 'numbered-list', label: 'Numbered List' },
+  { value: 'date', label: 'Date' },
+  { value: 'time', label: 'Time' },
+  { value: 'datetime', label: 'Date & Time' },
+  { value: 'link', label: 'Hyperlink' },
+  { value: 'image', label: 'Image URL' },
+]
 
 export default function EditPage() {
   const { id } = useParams()
@@ -12,11 +24,18 @@ export default function EditPage() {
   const [content, setContent] = useState('')
   const [variables, setVariables] = useState([])
   const [newVar, setNewVar] = useState('')
+  const [newType, setNewType] = useState('text')
 
   const scanVariables = () => {
     const found = [...content.matchAll(/{{(.*?)}}/g)].map(m => m[1])
-    const unique = Array.from(new Set([...variables, ...found]))
-    setVariables(unique)
+    const names = variables.map(v => v.name)
+    const updated = [...variables]
+    found.forEach(f => {
+      if (!names.includes(f)) {
+        updated.push({ name: f, type: 'text' })
+      }
+    })
+    setVariables(updated)
   }
 
   useEffect(() => {
@@ -32,25 +51,63 @@ export default function EditPage() {
 
   const addVariable = () => {
     const trimmed = newVar.trim()
-    if (trimmed && !variables.includes(trimmed)) {
-      setVariables([...variables, trimmed])
+    if (trimmed && !variables.some(v => v.name === trimmed)) {
+      setVariables([...variables, { name: trimmed, type: newType }])
 
-      setNewVar('')
-    }
+  const removeVar = name => setVariables(variables.filter(v => v.name !== name))
+
+  const updateVarType = (name, type) => {
+    setVariables(
+      variables.map(v => (v.name === name ? { ...v, type } : v))
+    )
+  }
+      variables,
   }
 
-  const removeVar = v => setVariables(variables.filter(x => x !== v))
-
-  const handleSubmit = e => {
-    e.preventDefault()
-    const t = {
-      id: editing ? id : uuidv4(),
-      name,
-      content,
-      variables
-    }
-    saveTemplate(t)
-    navigate('/')
+              placeholder="Variable name"
+            <select
+              className="form-select me-2"
+              style={{ maxWidth: '160px' }}
+              value={newType}
+              onChange={e => setNewType(e.target.value)}
+            >
+              {TYPE_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+              <li key={v.name} className="list-group-item">
+                <div className="d-flex align-items-center">
+                  <span className="me-3">{v.name}</span>
+                  <select
+                    className="form-select me-3"
+                    style={{ maxWidth: '160px' }}
+                    value={v.type}
+                    onChange={e => updateVarType(v.name, e.target.value)}
+                  >
+                    {TYPE_OPTIONS.map(o => (
+                      <option key={o.value} value={o.value}>
+                        {o.label}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-danger ms-auto"
+                    onClick={() => removeVar(v.name)}
+                  >
+                    Remove
+                  </button>
+                </div>
+        {editing && (
+          <Link
+            to={`/preview/${id}`}
+            className="btn btn-outline-secondary ms-2"
+          >
+            Preview
+          </Link>
+        )}
   }
 
   return (
