@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { loadTemplates } from '../utils/storage'
-import bbcode from 'bbcode-to-html'
-
-const parser = new bbcode.Parser()
+import parse from 'bbcode-to-html'
 
 export default function PreviewPage() {
   const { id } = useParams()
@@ -28,7 +26,7 @@ export default function PreviewPage() {
         const regex = new RegExp(`{{${k}}}`, 'g')
         result = result.replace(regex, v)
       })
-      setHtml(parser.process(result))
+      setHtml(parse(result))
     }
   }, [values, template])
 
