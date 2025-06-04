@@ -31,7 +31,7 @@ export default function PreviewPage() {
       case 'link':
         return `[url]${val}[/url]`
       case 'image':
-        return `[img]${val}[/img]`
+        return `[img=${val}]`
       default:
         return val
     }
