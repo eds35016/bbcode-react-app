@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { loadTemplates, saveTemplate } from '../utils/storage'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -65,16 +65,23 @@ export default function EditPage() {
     )
   }
 
+  const buildTemplate = () => ({
+    id: editing ? id : uuidv4(),
+    name,
+    content,
+    variables,
+  })
+
   const handleSubmit = e => {
     e.preventDefault()
-    const t = {
-      id: editing ? id : uuidv4(),
-      name,
-      content,
-      variables,
-    }
-    saveTemplate(t)
+    saveTemplate(buildTemplate())
     navigate('/')
+  }
+
+  const handleSavePreview = () => {
+    const t = buildTemplate()
+    saveTemplate(t)
+    navigate(`/preview/${t.id}`)
   }
 
   return (
@@ -170,14 +177,13 @@ export default function EditPage() {
           </ul>
         </div>
         <button type="submit" className="btn btn-primary">Save</button>
-        {editing && (
-          <Link
-            to={`/preview/${id}`}
-            className="btn btn-outline-secondary ms-2"
-          >
-            Preview
-          </Link>
-        )}
+        <button
+          type="button"
+          className="btn btn-outline-secondary ms-2"
+          onClick={handleSavePreview}
+        >
+          Save and Preview
+        </button>
       </form>
     </div>
   )
