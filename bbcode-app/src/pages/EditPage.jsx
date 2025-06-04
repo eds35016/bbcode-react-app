@@ -34,6 +34,7 @@ export default function EditPage() {
     const trimmed = newVar.trim()
     if (trimmed && !variables.includes(trimmed)) {
       setVariables([...variables, trimmed])
+
       setNewVar('')
     }
   }
