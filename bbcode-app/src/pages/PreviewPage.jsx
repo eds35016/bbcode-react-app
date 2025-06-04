@@ -3,12 +3,26 @@ import { useParams } from 'react-router-dom'
 import { loadTemplates } from '../utils/storage'
 import parse from 'bbcode-to-html'
 
+  const [activeVar, setActiveVar] = useState('')
 
-export default function PreviewPage() {
-  const { id } = useParams()
-  const [template, setTemplate] = useState(null)
-  const [values, setValues] = useState({})
-  const [html, setHtml] = useState('')
+      Object.keys(values).forEach(k => {
+        const token = `__VAR_${k}__`
+        result = result.replace(regex, token)
+      })
+      let output = parse(result)
+      Object.entries(values).forEach(([k, v]) => {
+        const token = `__VAR_${k}__`
+        const span = `<span data-var="${k}" class="${activeVar === k ? 'highlight' : ''}">${v}</span>`
+        output = output.replaceAll(token, span)
+      setHtml(output)
+  }, [values, template, activeVar])
+            <input
+              className="form-control"
+              value={values[v] || ''}
+              onFocus={() => setActiveVar(v)}
+              onBlur={() => setActiveVar('')}
+              onChange={e => updateValue(v, e.target.value)}
+            />
 
   useEffect(() => {
     const t = loadTemplates().find(t => t.id === id)
