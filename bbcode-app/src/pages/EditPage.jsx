@@ -35,13 +35,53 @@ export default function EditPage() {
     if (trimmed && !variables.includes(trimmed)) {
       setVariables([...variables, trimmed])
 
-      setNewVar('')
-    }
-  }
-
-  const removeVar = v => setVariables(variables.filter(x => x !== v))
-
-  const handleSubmit = e => {
+          <input
+            className="form-control"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+          />
+          <textarea
+            className="form-control"
+            rows="6"
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            required
+          />
+          <div className="form-text">
+            Use <code>{'{{variable}}'}</code> placeholders for values you want to
+            edit later.
+          </div>
+          <div className="form-text mb-2">
+            Add names manually or press <strong>Scan Template</strong> to detect
+            all <code>{'{{...}}'}</code> tokens in the text area above.
+          </div>
+            <input
+              className="form-control me-2"
+              value={newVar}
+              onChange={e => setNewVar(e.target.value)}
+            />
+            <button type="button" className="btn btn-secondary" onClick={addVariable}>
+              Add
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary ms-2"
+              onClick={scanVariables}
+            >
+              Scan Template
+            </button>
+              <li
+                key={v}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeVar(v)}
+                >
+                  Remove
+                </button>
     e.preventDefault()
     const t = {
       id: editing ? id : uuidv4(),
