@@ -59,24 +59,64 @@ export default function EditPage() {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Name</label>
-          <input className="form-control" value={name} onChange={e => setName(e.target.value)} required />
+          <input
+            className="form-control"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+          />
         </div>
         <div className="mb-3">
           <label className="form-label">BBCode Template</label>
-          <textarea className="form-control" rows="6" value={content} onChange={e => setContent(e.target.value)} required />
+          <textarea
+            className="form-control"
+            rows="6"
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            required
+          />
+          <div className="form-text">
+            Use <code>{'{{variable}}'}</code> placeholders for values you want to
+            edit later.
+          </div>
         </div>
         <div className="mb-3">
           <label className="form-label">Variables</label>
+          <div className="form-text mb-2">
+            Add names manually or press <strong>Scan Template</strong> to detect
+            all <code>{'{{...}}'}</code> tokens in the text area above.
+          </div>
           <div className="d-flex mb-2">
-            <input className="form-control me-2" value={newVar} onChange={e => setNewVar(e.target.value)} />
-            <button type="button" className="btn btn-secondary" onClick={addVariable}>Add</button>
-            <button type="button" className="btn btn-outline-secondary ms-2" onClick={scanVariables}>Scan Template</button>
+            <input
+              className="form-control me-2"
+              value={newVar}
+              onChange={e => setNewVar(e.target.value)}
+            />
+            <button type="button" className="btn btn-secondary" onClick={addVariable}>
+              Add
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline-secondary ms-2"
+              onClick={scanVariables}
+            >
+              Scan Template
+            </button>
           </div>
           <ul className="list-group">
             {variables.map(v => (
-              <li key={v} className="list-group-item d-flex justify-content-between align-items-center">
+              <li
+                key={v}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
                 {v}
-                <button type="button" className="btn btn-sm btn-danger" onClick={() => removeVar(v)}>Remove</button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-danger"
+                  onClick={() => removeVar(v)}
+                >
+                  Remove
+                </button>
               </li>
             ))}
           </ul>
