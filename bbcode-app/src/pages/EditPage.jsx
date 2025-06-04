@@ -13,6 +13,12 @@ export default function EditPage() {
   const [variables, setVariables] = useState([])
   const [newVar, setNewVar] = useState('')
 
+  const scanVariables = () => {
+    const found = [...content.matchAll(/{{(.*?)}}/g)].map(m => m[1])
+    const unique = Array.from(new Set([...variables, ...found]))
+    setVariables(unique)
+  }
+
   useEffect(() => {
     if (editing) {
       const t = loadTemplates().find(t => t.id === id)
@@ -25,8 +31,10 @@ export default function EditPage() {
   }, [editing, id])
 
   const addVariable = () => {
-    if (newVar && !variables.includes(newVar)) {
-      setVariables([...variables, newVar])
+    const trimmed = newVar.trim()
+    if (trimmed && !variables.includes(trimmed)) {
+      setVariables([...variables, trimmed])
+
       setNewVar('')
     }
   }
@@ -62,6 +70,7 @@ export default function EditPage() {
           <div className="d-flex mb-2">
             <input className="form-control me-2" value={newVar} onChange={e => setNewVar(e.target.value)} />
             <button type="button" className="btn btn-secondary" onClick={addVariable}>Add</button>
+            <button type="button" className="btn btn-outline-secondary ms-2" onClick={scanVariables}>Scan Template</button>
           </div>
           <ul className="list-group">
             {variables.map(v => (
