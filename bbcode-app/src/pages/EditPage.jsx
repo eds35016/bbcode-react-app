@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { loadTemplates, saveTemplate } from '../utils/storage'
-import { v4 as uuidv4 } from 'uuid'
+import { loadTemplate, saveTemplate } from '../utils/api'
 
 const TYPE_OPTIONS = [
   { value: 'text', label: 'Text' },
@@ -40,12 +39,11 @@ export default function EditPage() {
 
   useEffect(() => {
     if (editing) {
-      const t = loadTemplates().find(t => t.id === id)
-      if (t) {
+      loadTemplate(id).then(t => {
         setName(t.name)
         setContent(t.content)
         setVariables(t.variables)
-      }
+      })
     }
   }, [editing, id])
 
@@ -66,21 +64,20 @@ export default function EditPage() {
   }
 
   const buildTemplate = () => ({
-    id: editing ? id : uuidv4(),
+    ...(editing && { id }),
     name,
     content,
     variables,
   })
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault()
-    saveTemplate(buildTemplate())
+    await saveTemplate(buildTemplate())
     navigate('/')
   }
 
-  const handleSavePreview = () => {
-    const t = buildTemplate()
-    saveTemplate(t)
+  const handleSavePreview = async () => {
+    const t = await saveTemplate(buildTemplate())
     navigate(`/preview/${t.id}`)
   }
 

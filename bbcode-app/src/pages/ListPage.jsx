@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { loadTemplates } from '../utils/storage'
+import { loadTemplates } from '../utils/api'
 
 export default function ListPage() {
   const [templates, setTemplates] = useState([])
 
   useEffect(() => {
-    setTemplates(loadTemplates())
+    loadTemplates().then(setTemplates).catch(() => setTemplates([]))
   }, [])
 
   return (
