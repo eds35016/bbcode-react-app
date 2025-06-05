@@ -4,6 +4,8 @@ import { promises as fs } from 'fs'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
+import { fileURLToPath } from 'url'
+import { dirname, join } from 'path'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -12,8 +14,9 @@ app.use(cors())
 app.use(express.json())
 
 const SECRET = process.env.JWT_SECRET || 'change_this_secret'
-const USERS_FILE = new URL('./data/users.json', import.meta.url).pathname
-const TEMPLATES_FILE = new URL('./data/templates.json', import.meta.url).pathname
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const USERS_FILE = join(__dirname, 'data', 'users.json')
+const TEMPLATES_FILE = join(__dirname, 'data', 'templates.json')
 
 async function readJson(path, def) {
   try {
