@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { loadTemplates } from '../utils/storage'
+import { loadTemplate, shareTemplate } from '../utils/api'
 import parse from 'bbcode-to-html'
 
 export default function PreviewPage() {
@@ -10,6 +10,7 @@ export default function PreviewPage() {
   const [html, setHtml] = useState('')
   const [activeVar, setActiveVar] = useState('')
   const [copyMsg, setCopyMsg] = useState('')
+  const [shareLink, setShareLink] = useState('')
 
   const formatValue = (val, type) => {
     if (!val) return ''
@@ -38,15 +39,14 @@ export default function PreviewPage() {
   }
 
   useEffect(() => {
-    const t = loadTemplates().find(t => t.id === id)
-    if (t) {
+    loadTemplate(id).then(t => {
       const vars = {}
       t.variables.forEach(v => {
         vars[v.name] = ''
       })
       setValues(vars)
       setTemplate(t)
-    }
+    })
   }, [id])
 
   useEffect(() => {
@@ -102,6 +102,13 @@ export default function PreviewPage() {
     }
   }
 
+  const createShare = async () => {
+    const res = await shareTemplate(id)
+    const url = `${window.location.origin}/share/${res.shareId}`
+    await navigator.clipboard.writeText(url)
+    setShareLink(url)
+  }
+
   return (
     <div className="row">
       <div className="col-md-4">
@@ -145,12 +152,18 @@ export default function PreviewPage() {
             <Link to={`/edit/${id}`} className="btn btn-outline-secondary me-2">
               Edit Template
             </Link>
-            <button type="button" className="btn btn-secondary" onClick={copyBBCode}>
+            <button type="button" className="btn btn-secondary me-2" onClick={copyBBCode}>
               Copy BBCode
+            </button>
+            <button type="button" className="btn btn-outline-secondary" onClick={createShare}>
+              Share
             </button>
           </div>
         </div>
         {copyMsg && <div className="text-success mb-2">{copyMsg}</div>}
+        {shareLink && (
+          <div className="text-success mb-2">Share link copied! {shareLink}</div>
+        )}
         <div className="p-3 border" dangerouslySetInnerHTML={{ __html: html }} />
       </div>
     </div>
