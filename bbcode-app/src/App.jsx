@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import ListPage from './pages/ListPage'
 import EditPage from './pages/EditPage'
@@ -6,15 +6,26 @@ import PreviewPage from './pages/PreviewPage'
 import SharedPreviewPage from './pages/SharedPreviewPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
-import { isLoggedIn, logout } from './utils/api'
+import { isLoggedIn, logout, getUser } from './utils/api'
 import RequireAuth from './utils/RequireAuth'
 
 function App() {
   const [auth, setAuth] = useState(isLoggedIn())
+  const [user, setUser] = useState(getUser())
+
+  useEffect(() => {
+    const onAuthChange = () => {
+      setAuth(isLoggedIn())
+      setUser(getUser())
+    }
+    window.addEventListener('authchange', onAuthChange)
+    return () => window.removeEventListener('authchange', onAuthChange)
+  }, [])
 
   const handleLogout = () => {
     logout()
     setAuth(false)
+    setUser(null)
   }
 
   return (
@@ -22,9 +33,14 @@ function App() {
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div className="container-fluid">
           <Link className="navbar-brand" to="/">BBCode Templates</Link>
-          <div className="d-flex ms-auto">
+          <div className="d-flex ms-auto align-items-center">
             {auth ? (
-              <button className="btn btn-outline-light" onClick={handleLogout}>Logout</button>
+              <>
+                {user && (
+                  <span className="navbar-text text-white me-3">Logged in as {user.username}</span>
+                )}
+                <button className="btn btn-outline-light" onClick={handleLogout}>Logout</button>
+              </>
             ) : (
               <Link className="btn btn-outline-light" to="/login">Login</Link>
             )}

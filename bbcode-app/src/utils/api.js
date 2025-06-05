@@ -4,6 +4,17 @@ function getToken() {
   return localStorage.getItem('token')
 }
 
+export function getUser() {
+  const token = getToken()
+  if (!token) return null
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return { id: payload.id, username: payload.username }
+  } catch {
+    return null
+  }
+}
+
 export async function login(username, password) {
   const res = await fetch(`${API_URL}/login`, {
     method: 'POST',
@@ -13,6 +24,7 @@ export async function login(username, password) {
   if (!res.ok) throw new Error('Login failed')
   const data = await res.json()
   localStorage.setItem('token', data.token)
+  window.dispatchEvent(new Event('authchange'))
 }
 
 export async function register(username, password) {
@@ -24,6 +36,7 @@ export async function register(username, password) {
   if (!res.ok) throw new Error('Register failed')
   const data = await res.json()
   localStorage.setItem('token', data.token)
+  window.dispatchEvent(new Event('authchange'))
 }
 
 async function authFetch(url, options = {}) {
@@ -80,6 +93,7 @@ export async function loadSharedTemplate(shareId) {
 
 export function logout() {
   localStorage.removeItem('token')
+  window.dispatchEvent(new Event('authchange'))
 }
 
 export function isLoggedIn() {
