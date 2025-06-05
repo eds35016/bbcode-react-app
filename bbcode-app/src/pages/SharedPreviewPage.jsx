@@ -11,7 +11,7 @@ export default function SharedPreviewPage() {
   useEffect(() => {
     loadSharedTemplate(shareId).then(t => {
       setTemplate(t)
-      setHtml(parse(t.content))
+      setHtml(parse(t.content).replace(/(?:\r\n|\r|\n)/g, '<br/>'))
     })
   }, [shareId])
 

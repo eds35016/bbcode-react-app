@@ -58,6 +58,7 @@ export default function PreviewPage() {
         result = result.replace(regex, token)
       })
       let output = parse(result)
+        .replace(/(?:\r\n|\r|\n)/g, '<br/>')
       Object.entries(values).forEach(([k, v]) => {
         const token = `__VAR_${k}__`
         const type = template.variables.find(x => x.name === k)?.type || 'text'
